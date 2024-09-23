@@ -41,7 +41,7 @@
 
 // RHPort max operational speed can defined by board.mk
 #ifndef BOARD_TUD_MAX_SPEED
-#define BOARD_TUD_MAX_SPEED   OPT_MODE_DEFAULT_SPEED
+#define BOARD_TUD_MAX_SPEED   OPT_MODE_DEFAULT_SPEED //OPT_MODE_HIGH_SPEED
 #endif
 
 //--------------------------------------------------------------------
@@ -58,7 +58,7 @@
 #endif
 
 #ifndef CFG_TUSB_DEBUG
-#define CFG_TUSB_DEBUG        0
+#define CFG_TUSB_DEBUG        3
 #endif
 
 // Enable Device stack

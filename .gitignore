@@ -32,3 +32,6 @@ __pycache__
 cmake-build-*
 sdkconfig
 .PVS-Studio
+build/*
+*/build/*
+

@@ -47,8 +47,8 @@
 #define UART_RX_PIN           GPIO_PIN_9
 
 // VBUS Sense detection
-#define OTG_FS_VBUS_SENSE     1
-#define OTG_HS_VBUS_SENSE     0
+#define OTG_FS_VBUS_SENSE     0
+#define OTG_HS_VBUS_SENSE     1
 
 // STM32F723 has only one USB HS peripheral
 // Nucleo board does not have ULPI so USB will operate in FS mode only
