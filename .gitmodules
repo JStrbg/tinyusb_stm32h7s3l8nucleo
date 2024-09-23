@@ -1,0 +1,6 @@
+[submodule "hw/mcu/st/cmsis_device_h7"]
+	path = hw/mcu/st/cmsis_device_h7
+	url = https://github.com/STMicroelectronics/cmsis_device_h7
+[submodule "hw/mcu/st/cmsis_device_h7rs"]
+	path = hw/mcu/st/cmsis_device_h7rs
+	url = https://github.com/STMicroelectronics/cmsis_device_h7rs

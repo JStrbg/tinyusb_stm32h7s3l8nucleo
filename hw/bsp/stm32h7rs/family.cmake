@@ -1,6 +1,6 @@
 include_guard()
 
-set(ST_FAMILY h7)
+set(ST_FAMILY h7rs)
 set(ST_PREFIX stm32${ST_FAMILY}xx)
 
 set(ST_HAL_DRIVER ${TOP}/hw/mcu/st/stm32${ST_FAMILY}xx_hal_driver)
