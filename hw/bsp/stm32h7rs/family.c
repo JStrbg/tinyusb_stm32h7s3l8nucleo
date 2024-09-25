@@ -27,7 +27,7 @@
  * This file is part of the TinyUSB stack.
  */
 
-#include "stm32h7xx_hal.h"
+#include "stm32h7rsxx_hal.h"
 #include "bsp/board_api.h"
 
 TU_ATTR_UNUSED static void Error_Handler(void) {
@@ -83,8 +83,10 @@ void trace_etm_init(void) {
 #endif
 
 void board_init(void) {
+  HAL_Init();
   // Implemented in board.h
   SystemClock_Config();
+  SystemCoreClockUpdate();
 
   // Enable All GPIOs clocks
   __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -95,10 +97,11 @@ void board_init(void) {
   __HAL_RCC_GPIOF_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE(); // USB ULPI NXT
-#ifdef __HAL_RCC_GPIOI_CLK_ENABLE
-  __HAL_RCC_GPIOI_CLK_ENABLE(); // USB ULPI NXT
-#endif
-  __HAL_RCC_GPIOJ_CLK_ENABLE();
+  __HAL_RCC_GPIOM_CLK_ENABLE();
+// #ifdef __HAL_RCC_GPIOI_CLK_ENABLE
+//   __HAL_RCC_GPIOI_CLK_ENABLE(); // USB ULPI NXT
+// #endif
+//   __HAL_RCC_GPIOJ_CLK_ENABLE();
 
   trace_etm_init();
 
@@ -199,50 +202,29 @@ void board_init(void) {
 #endif // vbus sense
 
 #elif BOARD_TUD_RHPORT == 1
-  // Despite being call USB2_OTG
-  // OTG_HS is marked as RHPort1 by TinyUSB to be consistent across stm32 port
-
-  struct {
-    GPIO_TypeDef* port;
-    uint32_t pin;
-  } const ulpi_pins[] =
-  {
-    ULPI_PINS
-  };
-
-  for (uint8_t i=0; i < sizeof(ulpi_pins)/sizeof(ulpi_pins[0]); i++)
-  {
-    GPIO_InitStruct.Pin       = ulpi_pins[i].pin;
-    GPIO_InitStruct.Mode      = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull      = GPIO_NOPULL;
-    GPIO_InitStruct.Speed     = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF10_OTG2_HS;
-    HAL_GPIO_Init(ulpi_pins[i].port, &GPIO_InitStruct);
-  }
 
   // Enable USB HS & ULPI Clocks
-  __HAL_RCC_USB1_OTG_HS_ULPI_CLK_ENABLE();
-  __HAL_RCC_USB1_OTG_HS_CLK_ENABLE();
+  __HAL_RCC_USB_OTG_HS_CLK_ENABLE();
+    __HAL_RCC_USBPHYC_CLK_ENABLE();
 
 #if OTG_HS_VBUS_SENSE
-  #error OTG HS VBUS Sense enabled is not implemented
-#else
-  // No VBUS sense
-  USB_OTG_HS->GCCFG &= ~USB_OTG_GCCFG_VBDEN;
 
-  // B-peripheral session valid override enable
-  USB_OTG_HS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOEN;
-  USB_OTG_HS->GOTGCTL |= USB_OTG_GOTGCTL_BVALOVAL;
+  // No VBUS sense
+  USB_OTG_HS->GCCFG |= USB_OTG_GCCFG_VBDEN;
+
+  // // B-peripheral session valid override enable
+  USB_OTG_HS->GOTGCTL &= ~USB_OTG_GOTGCTL_BVALOEN;
+  USB_OTG_HS->GOTGCTL &= ~USB_OTG_GOTGCTL_BVALOVAL;
 #endif
 
   // Force device mode
-  USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
-  USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
+  //USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
+  //USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
 
   HAL_PWREx_EnableUSBVoltageDetector();
 
   // For waveshare openh743 ULPI PHY reset walkaround
-  board_stm32h7_post_init();
+  //board_stm32h7_post_init();
 #endif // rhport = 1
 
 }

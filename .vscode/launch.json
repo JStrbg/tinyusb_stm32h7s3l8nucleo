@@ -1,0 +1,86 @@
+// AUTOMATICALLY GENERATED FILE. PLEASE DO NOT MODIFY IT MANUALLY
+//
+// PlatformIO Debugging Solution
+//
+// Documentation: https://docs.platformio.org/en/latest/plus/debugging.html
+// Configuration: https://docs.platformio.org/en/latest/projectconf/sections/env/options/debug/index.html
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "cwd": "${workspaceFolder}",
+            "gdbPath": "/usr/bin/arm-none-eabi-gdb",
+            "executable": "./build/usbtmc.elf",
+            "name": "Debug with ST-Link",
+            "request": "launch",
+            "liveWatch": {
+              "enabled": true,
+              "samplesPerSecond": 4
+            },
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "showDevDebugOutput": "none",
+            "svdPath": "/home/nnms/.platformio/platforms/ststm32/misc/svd/STM32H723.svd",
+            "servertype": "stlink"
+        },
+        {
+            "name": "Debug STM32H723 Nucleo",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "openocd",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/build/usbtmc.elf",
+            "device": "STM32H723ZG",
+
+            "liveWatch": {
+              "enabled": true,
+              "samplesPerSecond": 4
+            },
+            "configFiles": [
+              "interface/stlink.cfg",
+              "target/stm32h7x.cfg"
+            ],
+            "svdFile": "/home/nnms/.platformio/platforms/ststm32/misc/svd/STM32H723.svd",
+            "runToEntryPoint": "main",
+            "preLaunchTask": "build",
+            "postRestartCommands": [
+              "monitor reset halt",
+              "load"
+            ],
+            "openOCDLaunchCommands": [
+              "init",
+              "reset init"
+            ],
+            "armToolchainPath": "/usr/bin/",   // Path where arm-none-eabi-gdb is installed
+            "gdbPath": "/usr/bin/arm-none-eabi-gdb",
+            "searchDir": ["/usr/share/openocd/scripts"],
+            "showDevDebugOutput": "none",      // Set to "raw" if you want to debug OpenOCD output
+          },
+          {
+            "name": "WORKING 3rd TRY Debug stlink",
+            "type": "cortex-debug",
+            "request": "launch",
+            "servertype": "stlink",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceFolder}/Appli/Appli/build/Debug/HID_Standalone_Appli.elf",
+            "runToEntryPoint": "main",
+            "armToolchainPath": "/usr/bin/",   // Path where arm-none-eabi-gdb is installed
+            "gdbPath": "/usr/bin/arm-none-eabi-gdb",
+            "stm32cubeprogrammer": "/opt/st/stm32cubeclt_1.16.0/STM32CubeProgrammer/bin/",
+            "searchDir": ["/usr/share/openocd/scripts"],
+            "v1": false,
+            "showDevDebugOutput": "both",
+            "serverArgs": [
+                "-l", "1",
+                "-m", "1",
+                "-k",
+                "-t","-s"
+            ],
+            "postRestartCommands": [
+              "monitor reset halt",
+              "load"
+            ],
+          },
+    ]
+}

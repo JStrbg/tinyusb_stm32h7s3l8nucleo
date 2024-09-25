@@ -1,5 +1,5 @@
 UF2_FAMILY_ID = 0x6db66082
-ST_FAMILY = h7
+ST_FAMILY = h7rs
 DEPS_SUBMODULES += lib/CMSIS_5 hw/mcu/st/cmsis_device_$(ST_FAMILY) hw/mcu/st/stm32$(ST_FAMILY)xx_hal_driver
 
 ST_CMSIS = hw/mcu/st/cmsis_device_$(ST_FAMILY)
@@ -12,7 +12,7 @@ CPU_CORE ?= cortex-m7
 # Compiler Flags
 # --------------
 CFLAGS += \
-  -DCFG_TUSB_MCU=OPT_MCU_STM32H7 \
+  -DCFG_TUSB_MCU=OPT_MCU_STM32H7RS \
 	-DBOARD_TUD_RHPORT=$(PORT)
 
 ifeq ($(PORT), 1)
@@ -20,7 +20,7 @@ ifeq ($(PORT), 1)
     CFLAGS += -DBOARD_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED
     $(info "Using OTG_HS in HighSpeed mode")
   else
-    CFLAGS += -DBOARD_TUD_MAX_SPEED=OPT_MODE_FULL_SPEED
+    CFLAGS += -DBOARD_TUD_MAX_SPEED=OPT_MODE_HIGH_SPEED
     $(info "Using OTG_HS in FullSpeed mode")
   endif
 else

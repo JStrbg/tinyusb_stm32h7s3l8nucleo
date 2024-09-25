@@ -1,7 +1,11 @@
 CFLAGS += -DSTM32H7S3xx -DHSE_VALUE=24000000
 
-# Default is FulSpeed port
-PORT ?= 0
+# Default is HighSpeed port
+PORT ?= 1
+LOG  = 2
+DEBUG = 1
+SPEED = high	# high or full
+LOGGER = swo
 
 # GCC
 SRC_S_GCC += $(ST_CMSIS)/Source/Templates/gcc/startup_stm32h7s3xx.s
