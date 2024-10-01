@@ -48,7 +48,7 @@
 
 // VBUS Sense detection
 #define OTG_FS_VBUS_SENSE     0
-#define OTG_HS_VBUS_SENSE     1
+#define OTG_HS_VBUS_SENSE     0
 
 // STM32F723 has only one USB HS peripheral
 // Nucleo board does not have ULPI so USB will operate in FS mode only
@@ -68,17 +68,24 @@ static inline void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
   RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
 
-  /* The PWR block is always enabled on the H7 series- there is no clock
-     enable. For now, use the default VOS3 scale mode (lowest) and limit clock
-     frequencies to avoid potential current draw problems from bus
-     power when using the max clock speeds throughout the chip. */
+  RCC_PeriphCLKInitTypeDef RCC_PeriphCLKInitStruct = { 0 };
+
+  RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USBPHYC;
+  RCC_PeriphCLKInitStruct.UsbPhycClockSelection = RCC_USBPHYCCLKSOURCE_HSE;
+  if (HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphCLKInitStruct) != HAL_OK)
+  {
+    while(1);
+  }
+      /* Peripheral clock enable */
+    //__HAL_RCC_USB_OTG_HS_CLK_ENABLE();
+    //__HAL_RCC_USBPHYC_CLK_ENABLE();
   HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY); // Select the power supply
   HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE0); // VOS0 for max speed
 
   /* Enable HSE Oscillator and activate PLL1 with HSE as source */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE | RCC_OSCILLATORTYPE_HSI48;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.HSIState = RCC_HSI_OFF;
+  //RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.CSIState = RCC_CSI_OFF;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.PLL1.PLLState = RCC_PLL_ON;
@@ -129,21 +136,21 @@ static inline void SystemClock_Config(void)
      separate. However, the main system PLL (PLL1) doesn't have a direct
      connection to the USB peripheral clock to generate 48 MHz, so we do this
      dance. This will connect PLL1's Q output to the USB peripheral clock. */
-  RCC_PeriphCLKInitTypeDef RCC_PeriphCLKInitStruct = { 0 };
 
-    RCC_PeriphCLKInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USBPHYC;
-    RCC_PeriphCLKInitStruct.UsbPhycClockSelection = RCC_USBPHYCCLKSOURCE_HSE;
-  HAL_RCCEx_PeriphCLKConfig(&RCC_PeriphCLKInitStruct);
+      /*activate CSI clock mondatory for I/O Compensation Cell*/
+  //__HAL_RCC_CSI_ENABLE();
 
-  /*TODO, CHECK IF THESE ARE APPLIED ELSEWHERE*/
-      HAL_PWREx_EnableUSBVoltageDetector();
+  // /* Enable SYSCFG clock mondatory for I/O Compensation Cell */
+  // __HAL_RCC_SYSCFG_CLK_ENABLE();
 
-    /* Peripheral clock enable */
-    //__HAL_RCC_USB_OTG_HS_CLK_ENABLE();
-    //__HAL_RCC_USBPHYC_CLK_ENABLE();
+  /* Enables the I/O Compensation Cell */
+  //HAL_EnableCompensationCell();
+
+    /*TODO, CHECK IF THESE ARE APPLIED ELSEWHERE*/
+    HAL_PWREx_EnableUSBHSregulator();
+    //HAL_PWREx_EnableUSBVoltageDetector();
 
     /* Peripheral interrupt init */
-    HAL_NVIC_SetPriority(OTG_HS_IRQn, 6, 0); // prio 6 corrrect? with or without freertos?
     //HAL_NVIC_EnableIRQ(OTG_HS_IRQn);
     /*END TODO^*/
 

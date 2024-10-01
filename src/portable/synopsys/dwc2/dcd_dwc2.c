@@ -433,15 +433,17 @@ void print_dwc2_info(dwc2_regs_t* dwc2) {
 #endif
 
 static void reset_core(dwc2_regs_t* dwc2) {
+  
+  // wait for AHB master IDLE
+  while (!(dwc2->grstctl & GRSTCTL_AHBIDL)) {}
+  
   // reset core
   dwc2->grstctl |= GRSTCTL_CSRST;
 
   // wait for reset bit is cleared
+  
   // TODO version 4.20a should wait for RESET DONE mask
   while (dwc2->grstctl & GRSTCTL_CSRST) {}
-
-  // wait for AHB master IDLE
-  while (!(dwc2->grstctl & GRSTCTL_AHBIDL)) {}
 
   // wait for device mode ?
 }
@@ -458,6 +460,12 @@ static bool phy_hs_supported(dwc2_regs_t* dwc2) {
   return dwc2->ghwcfg2_bm.hs_phy_type != HS_PHY_TYPE_NONE;
 #endif
 }
+typedef enum
+{
+  USB_DEVICE_MODE = 0,
+  USB_HOST_MODE   = 1,
+  USB_DRD_MODE    = 2
+} USB_ModeTypeDef;
 
 static void phy_fs_init(dwc2_regs_t* dwc2) {
   TU_LOG(DWC2_DEBUG, "Fullspeed PHY init\r\n");
@@ -487,7 +495,7 @@ static void phy_hs_init(dwc2_regs_t* dwc2) {
   uint32_t gusbcfg = dwc2->gusbcfg;
 
   // De-select FS PHY
-  gusbcfg &= ~GUSBCFG_PHYSEL;
+  //gusbcfg &= ~GUSBCFG_PHYSEL;
 
   if (dwc2->ghwcfg2_bm.hs_phy_type == HS_PHY_TYPE_ULPI) {
     TU_LOG(DWC2_DEBUG, "Highspeed ULPI PHY init\r\n");
@@ -505,28 +513,42 @@ static void phy_hs_init(dwc2_regs_t* dwc2) {
     gusbcfg &= ~(GUSBCFG_ULPIFSLS | GUSBCFG_ULPICSM);
   } else {
     TU_LOG(DWC2_DEBUG, "Highspeed UTMI+ PHY init\r\n");
-
+    gusbcfg &= ~(USB_OTG_GUSBCFG_TSDPS);
     // Select UTMI+ with 8-bit interface
-    gusbcfg &= ~(GUSBCFG_ULPI_UTMI_SEL | GUSBCFG_PHYIF16);
+    //gusbcfg &= ~(GUSBCFG_ULPI_UTMI_SEL | GUSBCFG_PHYIF16);
 
     // Set 16-bit interface if supported
-    if (dwc2->ghwcfg4_bm.utmi_phy_data_width) gusbcfg |= GUSBCFG_PHYIF16;
+    //if (dwc2->ghwcfg4_bm.utmi_phy_data_width) gusbcfg |= GUSBCFG_PHYIF16;
   }
-
+  //Device mode
+  //Maybe reset here or not
+  gusbcfg |= USB_OTG_GUSBCFG_FDMOD;
+  gusbcfg &= ~USB_OTG_GCCFG_PULLDOWNEN;
+   
   // Apply config
   dwc2->gusbcfg = gusbcfg;
+  reset_core(dwc2);
+
+   while ((dwc2->gusbcfg  & 0x1U) != (uint32_t)USB_DEVICE_MODE){};
+  
+    if (0 == 1U) //DMA_ENABLE
+    {
+      dwc2->gahbcfg |= USB_OTG_GAHBCFG_HBSTLEN_2;
+      dwc2->gahbcfg |= USB_OTG_GAHBCFG_DMAEN;
+    }
 
   // mcu specific phy init
-  dwc2_phy_init(dwc2, dwc2->ghwcfg2_bm.hs_phy_type);
+  //dwc2_phy_init(dwc2, dwc2->ghwcfg2_bm.hs_phy_type);
 
   // Reset core after selecting PHY
-  reset_core(dwc2);
+  
 
   // Set turn-around, must after core reset otherwise it will be clear
   // - 9 if using 8-bit PHY interface
   // - 5 if using 16-bit PHY interface
+  //Seem to be 9, so 8 bit phy
   gusbcfg &= ~GUSBCFG_TRDT_Msk;
-  gusbcfg |= (dwc2->ghwcfg4_bm.utmi_phy_data_width ? 5u : 9u) << GUSBCFG_TRDT_Pos;
+  gusbcfg |=  (uint32_t)((9 << 10) & USB_OTG_GUSBCFG_TRDT);
   dwc2->gusbcfg = gusbcfg;
 
   // MCU specific PHY update post reset
@@ -996,7 +1018,7 @@ static void handle_rxflvl_irq(uint8_t rhport) {
       break;
 
     default:    // Invalid
-      TU_BREAKPOINT();
+      //while(1);//TU_BREAKPOINT();
       break;
   }
 }

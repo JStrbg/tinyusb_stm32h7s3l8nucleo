@@ -86,7 +86,7 @@ void board_init(void) {
   HAL_Init();
   // Implemented in board.h
   SystemClock_Config();
-  SystemCoreClockUpdate();
+  //SystemCoreClockUpdate();
 
   // Enable All GPIOs clocks
   __HAL_RCC_GPIOA_CLK_ENABLE();
@@ -122,6 +122,8 @@ void board_init(void) {
 #endif
   NVIC_SetPriority(OTG_HS_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY );
 #endif
+
+  //NVIC_SetPriority(OTG_HS_IRQn, 6);
 
   GPIO_InitTypeDef GPIO_InitStruct;
 
@@ -205,7 +207,7 @@ void board_init(void) {
 
   // Enable USB HS & ULPI Clocks
   __HAL_RCC_USB_OTG_HS_CLK_ENABLE();
-    __HAL_RCC_USBPHYC_CLK_ENABLE();
+  __HAL_RCC_USBPHYC_CLK_ENABLE();
 
 #if OTG_HS_VBUS_SENSE
 
@@ -218,11 +220,22 @@ void board_init(void) {
 #endif
 
   // Force device mode
-  //USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
-  //USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
+  // USB_OTG_HS->GUSBCFG &= ~USB_OTG_GUSBCFG_FHMOD;
+  // USB_OTG_HS->GUSBCFG |= USB_OTG_GUSBCFG_FDMOD;
+  //USB_Corereset(1);
+ //(void)USB_SetDevSpeed(USBx, USB_OTG_SPEED_HIGH);
+  //USBx_PCGCCTL = 0U;
 
-  HAL_PWREx_EnableUSBVoltageDetector();
-
+  // if ((USBx->GUSBCFG & USB_OTG_GUSBCFG_PHYSEL) == 0U)
+  // {
+  //   if (cfg.speed == USBD_HS_SPEED)
+  //   {
+  //     /* Set Core speed to High speed mode */
+  //     (void)USB_SetDevSpeed(USBx, USB_OTG_SPEED_HIGH);
+  //   }
+  // }
+  //HAL_PWREx_EnableUSBVoltageDetector(); // needed?
+  //Reset core here? Dontr think så
   // For waveshare openh743 ULPI PHY reset walkaround
   //board_stm32h7_post_init();
 #endif // rhport = 1
