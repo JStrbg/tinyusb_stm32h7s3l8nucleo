@@ -21,7 +21,7 @@
             "type": "cortex-debug",
             "runToEntryPoint": "main",
             "showDevDebugOutput": "none",
-            "svdPath": "{workspaceFolder}/STM32H7RSxx.svd",
+            "svdFile": "${workspaceFolder}/STM32H7RSxx.svd",
             "servertype": "stlink"
         },
         {
@@ -31,17 +31,17 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "executable": "${workspaceFolder}/build/usbtmc.elf",
-            "device": "STM32H723ZG",
+            "device": "STM32H7S3L8",
 
-            "liveWatch": {
-              "enabled": true,
-              "samplesPerSecond": 4
-            },
+            // "liveWatch": {
+            //   "enabled": true,
+            //   "samplesPerSecond": 4
+            // },
             "configFiles": [
               "interface/stlink.cfg",
               "target/stm32h7x.cfg"
             ],
-            "svdPath": "{workspaceFolder}/STM32H7RSxx.svd",
+            "svdFile": "${workspaceFolder}/STM32H7RSxx.svd",
             "runToEntryPoint": "main",
             "preLaunchTask": "build",
             "postRestartCommands": [
@@ -50,7 +50,8 @@
             ],
             "openOCDLaunchCommands": [
               "init",
-              "reset init"
+              "reset init",
+              "halt"
             ],
             "armToolchainPath": "/usr/bin/",   // Path where arm-none-eabi-gdb is installed
             "gdbPath": "/usr/bin/arm-none-eabi-gdb",
@@ -69,12 +70,12 @@
             //   "target/stm32h7x.cfg"
             // ]
             "cwd": "${workspaceRoot}",
-            //"executable": "${workspaceFolder}/build/usbtmc.elf",
             "executable": "${workspaceFolder}/build/usbtmc.elf",
+            "svdFile": "${workspaceFolder}/STM32H7RSxx.svd",
             "runToEntryPoint": "main",
             "armToolchainPath": "/usr/bin/",   // Path where arm-none-eabi-gdb is installed
             "gdbPath": "/usr/bin/arm-none-eabi-gdb",
-            "stm32cubeprogrammer": "/opt/st/stm32cubeclt_1.16.0/STM32CubeProgrammer/bin/",
+            //"stm32cubeprogrammer": "/home/nnms/STMicroelectronics/STM32Cube/STM32CubeProgrammer/bin/STM32_Programmer_CLI",
             "searchDir": ["/usr/share/openocd/scripts"],
             "v1": false,
             "svdPath": "{workspaceFolder}/STM32H7RSxx.svd",

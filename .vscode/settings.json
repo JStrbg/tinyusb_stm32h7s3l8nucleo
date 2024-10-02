@@ -1,0 +1,4 @@
+{
+    "cmake.sourceDirectory": "/home/nnms/tinyusb_stm32h7s3l8nucleo/examples/device/usbtmc",
+    "C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc"
+}
